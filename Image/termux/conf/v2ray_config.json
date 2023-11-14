@@ -1,0 +1,120 @@
+{
+  "policy": {
+    "system": {
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
+    }
+  },
+  "log": {
+    "access": "",
+    "error": "",
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "tag": "http",
+      "port": 10807,
+      "listen": "127.0.0.1",
+      "protocol": "http",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      },
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "allowTransparent": false
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy",
+      "protocol": "socks",
+      "settings": {
+        "servers": [
+          {
+            "address": "***.***.***",
+            "port": 10808,
+            "users": [
+              {
+                "user": "***",
+                "pass": "***"
+              }
+            ]
+          }
+        ]
+      },
+      "mux": {
+        "enabled": false
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {}
+    }
+  ],
+  "dns": {
+    "servers": ["127.0.0.1", "8.8.8.8", "8.8.4.4", "223.5.5.5", "223.6.6.6"]
+  },
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "domainMatcher": "mph",
+    "rules": [
+      {
+        "type": "field",
+        "port": "0-65535",
+        "network": "tcp,udp",
+        "inboundTag": [],
+        "outboundTag": "block",
+        "domain": ["geosite:category-ads-all"],
+        "enabled": true
+      },
+      {
+        "type": "field",
+        "port": "0-65535",
+        "network": "tcp,udp",
+        "inboundTag": [],
+        "outboundTag": "proxy",
+        "domain": ["geosite:zhihu"],
+        "enabled": true
+      },
+      {
+        "type": "field",
+        "port": "0-65535",
+        "network": "tcp,udp",
+        "inboundTag": [],
+        "outboundTag": "direct",
+        "domain": [
+          "geosite:cn",
+          "geosite:private",
+          "geosite:geolocation-cn",
+          "geosite:douban",
+          "domain:emby.izual.site",
+          "domain:izual.site",
+          "domain:zjks.com",
+          "domain:webapp.shenghuoyingxiong.com",
+          "domain:aws.amazon.com",
+          "domain:cloudfront.net",
+          "domain:nobepay.com",
+          "domain:pan.ttxiaoshuo.top"
+        ],
+        "enabled": true
+      },
+      {
+        "type": "field",
+        "port": "0-65535",
+        "network": "tcp,udp",
+        "inboundTag": [],
+        "outboundTag": "proxy",
+        "enabled": true
+      }
+    ]
+  }
+}
